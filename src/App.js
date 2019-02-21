@@ -11,7 +11,13 @@ class App extends React.Component {
       value2: "0",
       data: [
         {
-          type: "surface",
+          type: "contour",
+          z: []
+        }
+      ],
+      spectrumData: [
+        {
+          type: "contour",
           z: []
         }
       ]
@@ -36,7 +42,8 @@ class App extends React.Component {
 
   componentDidMount() {
     axios
-      .get("http://localhost:8000/getwavematrix/", {
+      .get("http://0.0.0.0:5000/getwavematrixwparam/", {
+        params: { windspeed: this.state.value1, angle: this.state.value2 },
         headers: {
           "Access-Control-Allow-Origin": "*"
         }
@@ -45,8 +52,14 @@ class App extends React.Component {
         this.setState({
           data: [
             {
-              type: "surface",
+              type: "contour",
               z: json.data.data
+            }
+          ],
+          spectrumData: [
+            {
+              type: "contour",
+              z: json.data.initSpectrum
             }
           ]
         })
@@ -56,7 +69,7 @@ class App extends React.Component {
 
   async onParamChange(windSpeed, angleDegree) {
     const response = await axios
-      .get("http://localhost:8000/getwavematrixwparam/", {
+      .get("http://0.0.0.0:5000/getwavematrixwparam/", {
         params: { windspeed: windSpeed, angle: angleDegree },
         headers: {
           "Access-Control-Allow-Origin": "*"
@@ -66,8 +79,14 @@ class App extends React.Component {
         this.setState({
           data: [
             {
-              type: "surface",
+              type: "contour",
               z: json.data.data
+            }
+          ],
+          spectrumData: [
+            {
+              type: "contour",
+              z: json.data.initSpectrum
             }
           ]
         })
@@ -79,38 +98,51 @@ class App extends React.Component {
     return (
       <div class="ui center aligned container">
         <div>
-          <input
-            type="range"
-            name="value1"
-            min="0"
-            max="6"
-            value={this.state.value1}
-            onChange={this.handleChange}
-            step="0.5"
+          <Plot
+            data={this.state.spectrumData}
+            layout={{
+              width: 400,
+              height: 400,
+              title: "A Fancy Plot of Wave Spectrum",
+              autosize: true
+            }}
           />
-          <label for="volume">Wind Speed = {this.state.value1}</label>
         </div>
 
         <div>
-          <input
-            type="range"
-            name="value2"
-            min="0"
-            max="360"
-            value={this.state.value2}
-            onChange={this.handleChange}
-            step="1"
-          />
-          <label for="volume">Wind Direction = {this.state.value2}</label>
-        </div>
+          <div>
+            <input
+              type="range"
+              name="value1"
+              min="0"
+              max="6"
+              value={this.state.value1}
+              onChange={this.handleChange}
+              step="0.5"
+            />
+            <label for="volume">Wind Speed = {this.state.value1}</label>
+          </div>
 
+          <div>
+            <input
+              type="range"
+              name="value2"
+              min="0"
+              max="360"
+              value={this.state.value2}
+              onChange={this.handleChange}
+              step="1"
+            />
+            <label for="volume">Wind Direction = {this.state.value2}</label>
+          </div>
+        </div>
         <div>
           <Plot
             data={this.state.data}
             layout={{
-              width: 500,
-              height: 500,
-              title: "A Fancy 3D Plot Of Waves",
+              width: 400,
+              height: 400,
+              title: "A Fancy Countour Plot of Waves",
               autosize: true
             }}
           />
